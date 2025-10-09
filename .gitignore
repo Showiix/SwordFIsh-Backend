@@ -1,0 +1,113 @@
+# 依赖文件
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# 运行时数据
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# 目录和缓存
+.npm
+.eslintcache
+.node_repl_history
+
+# 输出和构建文件
+dist/
+build/
+coverage/
+
+# 环境变量文件
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 日志文件
+logs/
+*.log
+lerna-debug.log*
+
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+
+# 上传文件目录
+uploads/
+temp/
+tmp/
+
+# 测试覆盖率报告
+coverage/
+.nyc_output/
+
+# IDE和编辑器文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 操作系统生成的文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 备份文件
+*.bak
+*.backup
+*.old
+
+# 文档生成
+docs/
+api-docs/
+
+# PM2 进程管理器
+.pm2/
+
+# Redis 持久化文件
+dump.rdb
+appendonly.aof
+
+# SSL 证书
+*.pem
+*.key
+*.crt
+*.csr
+
+# 压缩文件
+*.tar.gz
+*.zip
+*.rar
+
+# 自定义配置文件
+config/local.js
+config/local.json
+
+# 测试文件
+test-results/
+screenshots/
+
+# Docker 相关
+.dockerignore
+docker-compose.override.yml
+
+# 开发工具缓存
+.cache/
+.parcel-cache/
+
+# 临时文件
+*.tmp
+*.temp
