@@ -111,3 +111,24 @@ docker-compose.override.yml
 # 临时文件
 *.tmp
 *.temp
+
+
+# 其他文件
+*.md
+*.sql
+
+.env.development
+.env.production
+.env.test
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+
+
+
+.docker-compose.yml

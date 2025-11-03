@@ -1,0 +1,60 @@
+{
+  "compilerOptions": {
+    /* 基本选项 */
+    "target": "ES2020",                          // 编译目标
+    "module": "commonjs",                        // 模块系统
+    "lib": ["ES2020"],                           // 包含的库
+    "outDir": "./dist",                          // 输出目录
+    "rootDir": "./src",                          // 源码目录
+    
+    /* 模块解析 */
+    "moduleResolution": "node",                  // Node.js模块解析
+    "baseUrl": "./src",                          // 基础路径
+    "paths": {                                   // 路径别名
+      "@/*": ["./*"],
+      "@config/*": ["./config/*"],
+      "@controllers/*": ["./controllers/*"],
+      "@routes/*": ["./routes/*"],
+      "@models/*": ["./models/*"],
+      "@middleware/*": ["./middleware/*"],
+      "@utils/*": ["./utils/*"],
+      "@types/*": ["./types/*"]
+    },
+    "resolveJsonModule": true,                   // 支持导入JSON
+    
+    /* 类型检查 */
+    "strict": true,                              // 启用所有严格检查
+    "noImplicitAny": true,                       // 禁止隐式any
+    "strictNullChecks": true,                    // 严格空值检查
+    "strictFunctionTypes": true,                 // 严格函数类型检查
+    "noUnusedLocals": true,                      // 检查未使用的变量
+    "noUnusedParameters": true,                  // 检查未使用的参数
+    "noImplicitReturns": true,                   // 检查函数返回值
+    
+    /* 其他选项 */
+    "esModuleInterop": true,                     // ES模块互操作
+    "allowSyntheticDefaultImports": true,        // 允许默认导入
+    "skipLibCheck": true,                        // 跳过库文件检查
+    "forceConsistentCasingInFileNames": true,    // 强制文件名大小写一致
+    
+    /* 装饰器（可选） */
+    "experimentalDecorators": true,              // 启用装饰器
+    "emitDecoratorMetadata": true,               // 发出装饰器元数据
+    
+    /* 源码映射（调试用） */
+    "sourceMap": true                            // 生成source map
+  },
+  
+  /* 包含的文件 */
+  "include": [
+    "src/**/*"
+  ],
+  
+  /* 排除的文件 */
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ]
+}
