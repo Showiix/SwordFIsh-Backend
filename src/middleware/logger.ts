@@ -81,7 +81,7 @@ export function requestLogger(
  */
 export function detailedLogger(
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): void {
   console.log('🔍 详细请求信息:', {

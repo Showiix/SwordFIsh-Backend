@@ -7,7 +7,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../utils/AppError';  // ✅ 导入错误类
 import { ApiResponse } from '../types';
-import { url } from 'inspector';
 
 /**
  * 错误处理中间件
@@ -22,7 +21,7 @@ export function errorHandler(
     err: Error | AppError,
     req: Request,
     res: Response<ApiResponse<null>>,
-    next: NextFunction
+    _next: NextFunction
 ):void 
 {
     console.error("错误发生",{
@@ -99,7 +98,7 @@ export function errorHandler(
 export function notFoundHandler(
     req: Request,
     res: Response<ApiResponse<null>>,
-    next: NextFunction
+    _next: NextFunction
 ):void 
 {
     const response : ApiResponse<null> = {

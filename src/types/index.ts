@@ -65,6 +65,7 @@ export interface ApiResponse<T> {
 export interface UserAttributes {
     id: number;                              // 主键
     student_id: string;                      // 学号
+    username: string;                        // 用户名
     email: string;                    // 邮箱
     password: string;                        // ⚠️ 加密后的密码
     real_name?: string;                      // 真实姓名（可选）
@@ -106,4 +107,41 @@ import { Request } from "express";
 
 export interface AuthRequest extends Request {
     user?: UserAttributes;
+}
+
+// ========================================
+// 🎯 获取个人信息相关类型
+// ========================================
+
+/**
+ * 获取用户信息的响应数据
+ * 🤔 为什么要单独定义？
+ * 答：和注册返回的数据不同，这里包含更多信息（如头像、手机号、信用分数等）
+ */
+export interface UserInfoResponseData {
+    user_id: number;              // 用户ID
+    student_id: string;           // 学号
+    email: string;                // 邮箱
+    real_name?: string;           // 真实姓名（可选）
+    phone?: string;               // 手机号（可选）
+    avatar_url?: string;          // 头像URL（可选）
+    auth_status: number;          // 认证状态：0=未认证，1=已认证
+    credit_score: number;         // 信用分数
+    status: 'active' | 'inactive' | 'banned';  // 账户状态
+    created_at: Date;             // 注册时间
+}
+
+/**
+ * 扩展 Express Request 类型（用于JWT认证）
+ * 🤔 为什么要扩展？
+ * 答：JWT 中间件会把解析出的用户信息放到 req.user
+ *     但默认的 Request 类型没有 user 属性
+ *     所以需要扩展，让 TypeScript 知道有这个属性
+ */
+export interface AuthenticatedRequest extends Request {
+    user?: {
+        id: number;           // 从 Token 解析出的用户ID
+        student_id: string;   // 从 Token 解析出的学号
+        email: string;        // 从 Token 解析出的邮箱
+    };
 }

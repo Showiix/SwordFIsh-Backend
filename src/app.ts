@@ -45,7 +45,7 @@ app.use('/api/auth', authRoutes);
 // ========================================
 // 5️⃣ 健康检查
 // ========================================
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),

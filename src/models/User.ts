@@ -36,6 +36,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   // ========================================
   public id!: number;
   public student_id!: string;
+  public username!: string;
   public email!: string;
   public password!: string;
   public real_name?: string;
@@ -72,6 +73,11 @@ User.init(
       unique: true,
       comment: '学号'
     },
+    username: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      comment: '用户名'
+    },
     email: {
       type: DataTypes.STRING(100),
       allowNull: false,
@@ -84,6 +90,7 @@ User.init(
     password: {
       type: DataTypes.STRING(255),
       allowNull: false,
+      field: 'password_hash',
       comment: '加密后的密码'
     },
     real_name: {
@@ -119,6 +126,7 @@ User.init(
     last_login: {
       type: DataTypes.DATE,
       allowNull: true,
+      field: 'last_login_at',
       comment: '最后登录时间'
     },
     verification_token: {
@@ -160,7 +168,7 @@ User.init(
       },
       {
         unique: true,
-        fields: ['campus_email']
+        fields: ['email']
       },
       {
         fields: ['auth_status']
