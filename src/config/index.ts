@@ -133,8 +133,7 @@ const config: Config = {
         if (process.env.NODE_ENV === 'production') {
           throw new Error('JWT_SECRET must be set in production environment!');
         }
-        console.warn('⚠️  WARNING: Using default JWT secret. This is ONLY for deve
-          lopment!');
+        console.warn('⚠️  WARNING: Using default JWT secret. This is ONLY for development!');
         return 'dev_only_jwt_secret_DO_NOT_USE_IN_PRODUCTION';
       }
       return secret;

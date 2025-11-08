@@ -9,7 +9,7 @@ const storage = multer.memoryStorage();
 
 // 文件过滤器
 const fileFilter = (
-  req: Express.Request,
+  _req: Express.Request,
   file: Express.Multer.File,
   cb: multer.FileFilterCallback
 ) => {

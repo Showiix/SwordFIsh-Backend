@@ -8,7 +8,6 @@
 
 import { AppError } from "@/utils/AppError";
 import { Op, literal } from "sequelize";
-import { sequelize } from "@/config/database";
 import { minioClient, BUCKETS, getPublicUrl } from '@/config/minio';
 import crypto from 'crypto';
 
@@ -445,7 +444,7 @@ class ProductService {
         // 删除刚上传的文件
         for (const url of imageUrls) {
           const objectName = url.substring(url.lastIndexOf('/') + 1);
-          await minioClient.removeObject(BUCKETS.PRODUCTS, objectName).catch(err => {
+          await minioClient.removeObject(BUCKETS.PRODUCTS, objectName).catch((err: Error) => {
             console.error(`删除文件失败: ${objectName}`, err);
           });
         }

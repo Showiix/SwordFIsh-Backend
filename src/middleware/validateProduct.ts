@@ -20,14 +20,14 @@ import {
  * 验证商品标题
  */
 function isValidTitle(title: string): boolean {
-  return title && title.length >= 2 && title.length <= 200;
+  return !!(title && title.length >= 2 && title.length <= 200);
 }
 
 /**
  * 验证商品描述
  */
 function isValidDescription(description: string): boolean {
-  return description && description.length <= 2000;
+  return !!(description && description.length <= 2000);
 }
 
 /**

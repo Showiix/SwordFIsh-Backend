@@ -20,7 +20,7 @@ import { UserAttributes } from '../types';
 
 interface UserCreationAttributes extends Optional<
   UserAttributes,
-  'id' | 'real_name' | 'phone' | 'avatar_url' | 'last_login' | 'verification_token' | 'created_at' | 'updated_at'
+  'id' | 'real_name' | 'phone' | 'avatar_url' | 'last_login' | 'verification_token' | 'created_at' | 'updated_at' | 'auth_status' | 'status' | 'is_verified'
 > {}
 
 // ========================================
