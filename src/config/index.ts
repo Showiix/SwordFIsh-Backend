@@ -77,6 +77,15 @@ interface LogConfig {
   maxFiles: string;
 }
 
+interface MinioConfig {
+  endPoint: string;
+  port: number;
+  useSSL: boolean;
+  accessKey: string;
+  secretKey: string;
+  region: string;
+}
+
 // ========================================
 // 🎯 完整的配置接口
 // ========================================
@@ -90,6 +99,7 @@ export interface Config {
   upload: UploadConfig;
   rateLimit: RateLimitConfig;
   log: LogConfig;
+  minio: MinioConfig;
 }
 
 // ========================================
@@ -169,6 +179,15 @@ const config: Config = {
     level: process.env.LOG_LEVEL || 'info',
     maxSize: process.env.LOG_MAX_SIZE || '20m',
     maxFiles: process.env.LOG_MAX_FILES || '14d'
+  },
+
+  minio: {
+    endPoint: process.env.MINIO_ENDPOINT || 'localhost',
+    port: parseInt(process.env.MINIO_PORT || '9000', 10),
+    useSSL: process.env.MINIO_USE_SSL === 'true',
+    accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
+    secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
+    region: process.env.MINIO_REGION || 'us-east-1'
   }
 };
 

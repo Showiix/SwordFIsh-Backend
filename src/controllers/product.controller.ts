@@ -259,6 +259,90 @@ class ProductController {
       next(error);
     }
   }
+
+  // ========================================
+  // 🎯 上传商品图片
+  // ========================================
+  /**
+   * 上传商品图片
+   * POST /api/products/:id/images
+   */
+  async uploadImages(
+    req: AuthenticatedRequest,
+    res: Response<ApiResponse<any>>,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user!.id;
+      const productId = parseInt(req.params.id);
+      const files = req.files as Express.Multer.File[];
+
+      if (!files || files.length === 0) {
+        res.status(400).json({
+          code: 400,
+          msg: '请选择要上传的图片',
+          data: null
+        });
+        return;
+      }
+
+      console.log(`📸 上传商品图片，商品ID: ${productId}，图片数量: ${files.length}`);
+
+      const imageUrls = await productService.uploadProductImages(
+        productId,
+        userId,
+        files
+      );
+
+      res.status(200).json({
+        code: 200,
+        msg: '图片上传成功',
+        data: { images: imageUrls }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // ========================================
+  // 🎯 删除商品图片
+  // ========================================
+  /**
+   * 删除商品图片
+   * DELETE /api/products/:id/images
+   */
+  async deleteImage(
+    req: AuthenticatedRequest,
+    res: Response<ApiResponse<null>>,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user!.id;
+      const productId = parseInt(req.params.id);
+      const { imageUrl } = req.body;
+
+      if (!imageUrl) {
+        res.status(400).json({
+          code: 400,
+          msg: '缺少 imageUrl 参数',
+          data: null
+        });
+        return;
+      }
+
+      console.log(`🗑️ 删除商品图片，商品ID: ${productId}，图片URL: ${imageUrl}`);
+
+      await productService.deleteProductImage(productId, userId, imageUrl);
+
+      res.status(200).json({
+        code: 200,
+        msg: '图片删除成功',
+        data: null
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new ProductController();

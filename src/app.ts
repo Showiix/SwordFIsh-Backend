@@ -7,6 +7,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import authRoutes from './routes/auth.routes';
 import productRoutes from './routes/product.routes';
+import favoriteRoutes from './routes/favorite.routes';
+import searchRoutes from './routes/search.routes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { requestLogger, detailedLogger } from './middleware/logger';
 import { apiLimiter } from './middleware/rateLimiter';
@@ -46,6 +48,8 @@ app.use('/api/', apiLimiter);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/favorites', favoriteRoutes);
+app.use('/api/search', searchRoutes);
 // 每个路由内部还可以有自己的中间件
 
 // ========================================

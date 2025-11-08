@@ -7,7 +7,10 @@
 // - 返回数据，抛出错误由 Controller 捕获
 
 import { AppError } from "@/utils/AppError";
-import { Op } from "sequelize";
+import { Op, literal } from "sequelize";
+import { sequelize } from "@/config/database";
+import { minioClient, BUCKETS, getPublicUrl } from '@/config/minio';
+import crypto from 'crypto';
 
 // 导入模型时需要使用 require，因为 Product.js 是 CommonJS 模块
 const { Product, Category } = require("@/models/Product");
@@ -258,19 +261,27 @@ class ProductService {
       if (max_price !== undefined) where.price[Op.lte] = max_price;
     }
 
-    // 关键词搜索（标题或描述）
+    // 关键词搜索（使用全文索引优化）
+    // 🤔 为什么要同时支持全文搜索和 LIKE 搜索？
+    // 答：全文索引性能更好，但需要 MySQL 5.7+ 且需要创建索引
+    //     LIKE 作为后备方案，确保兼容性
+    let replacements: any = {};
+
     if (keyword) {
-      where[Op.or] = [
-        { title: { [Op.like]: `%${keyword}%` } },
-        { description: { [Op.like]: `%${keyword}%` } }
-      ];
+      // 使用全文索引搜索（推荐方式）
+      // MATCH...AGAINST 语法支持中文分词和相关性排序
+      where[Op.and] = where[Op.and] || [];
+      where[Op.and].push(
+        literal(`MATCH(title, description) AGAINST(:keyword IN NATURAL LANGUAGE MODE)`)
+      );
+      replacements.keyword = keyword;
     }
 
     // 计算偏移量
     const offset = (page - 1) * limit;
 
-    // 查询商品
-    const { count, rows } = await Product.findAndCountAll({
+    // 构建查询选项
+    const queryOptions: any = {
       where,
       include: [
         {
@@ -286,9 +297,29 @@ class ProductService {
       ],
       limit,
       offset,
-      order: [[sort, order]],
       distinct: true
-    });
+    };
+
+    // 如果有关键词搜索，添加 replacements
+    if (keyword) {
+      queryOptions.replacements = replacements;
+    }
+
+    // 排序逻辑
+    // 🤔 为什么搜索时要特殊处理排序？
+    // 答：全文搜索有内置的相关性评分，按相关性排序效果更好
+    if (keyword && sort === 'created_at') {
+      // 有关键词时，优先按相关性排序
+      queryOptions.order = [
+        [literal('MATCH(title, description) AGAINST(:keyword IN NATURAL LANGUAGE MODE)'), 'DESC'],
+        [sort, order]
+      ];
+    } else {
+      queryOptions.order = [[sort, order]];
+    }
+
+    // 查询商品
+    const { count, rows } = await Product.findAndCountAll(queryOptions);
 
     console.log(`✅ 查询成功，共 ${count} 条记录`);
 
@@ -346,6 +377,143 @@ class ProductService {
         totalPages: Math.ceil(count / limit)
       }
     };
+  }
+
+  // ========================================
+  // 🎯 上传商品图片
+  // ========================================
+  /**
+   * 上传商品图片到 MinIO
+   * 🤔 为什么要验证商品所有者？
+   * 答：只有卖家本人才能上传自己商品的图片
+   */
+  async uploadProductImages(
+    productId: number,
+    sellerId: number,
+    files: Express.Multer.File[]
+  ): Promise<string[]> {
+    console.log(`📸 上传商品图片到 MinIO，商品ID: ${productId}，图片数量: ${files.length}`);
+
+    try {
+      // 1️⃣ 验证商品存在且属于当前用户
+      const product = await Product.findByPk(productId);
+
+      if (!product) {
+        throw new AppError(404, 'PRODUCT_NOT_FOUND', '商品不存在');
+      }
+
+      if (product.seller_id !== sellerId) {
+        throw new AppError(403, 'FORBIDDEN', '无权上传此商品图片');
+      }
+
+      // 2️⃣ 上传文件到 MinIO 并生成 URL 列表
+      const imageUrls: string[] = [];
+
+      for (const file of files) {
+        // 生成唯一文件名：时间戳 + 随机字符串 + 原扩展名
+        const timestamp = Date.now();
+        const randomStr = crypto.randomBytes(6).toString('hex');
+        const ext = file.originalname.substring(file.originalname.lastIndexOf('.'));
+        const objectName = `product-${productId}-${timestamp}-${randomStr}${ext}`;
+
+        // 上传到 MinIO
+        await minioClient.putObject(
+          BUCKETS.PRODUCTS,
+          objectName,
+          file.buffer,
+          file.size,
+          {
+            'Content-Type': file.mimetype,
+            'x-amz-meta-product-id': productId.toString(),
+            'x-amz-meta-seller-id': sellerId.toString(),
+          }
+        );
+
+        // 生成公开访问 URL
+        const imageUrl = getPublicUrl(BUCKETS.PRODUCTS, objectName);
+        imageUrls.push(imageUrl);
+
+        console.log(`✅ 图片已上传: ${objectName}`);
+      }
+
+      // 3️⃣ 更新商品图片（追加到现有图片）
+      const currentImages = product.images ? JSON.parse(product.images) : [];
+      const newImages = [...currentImages, ...imageUrls];
+
+      // 限制最多10张图片
+      if (newImages.length > 10) {
+        // 删除刚上传的文件
+        for (const url of imageUrls) {
+          const objectName = url.substring(url.lastIndexOf('/') + 1);
+          await minioClient.removeObject(BUCKETS.PRODUCTS, objectName).catch(err => {
+            console.error(`删除文件失败: ${objectName}`, err);
+          });
+        }
+        throw new AppError(400, 'TOO_MANY_IMAGES', '商品图片最多10张');
+      }
+
+      await product.update({
+        images: JSON.stringify(newImages)
+      });
+
+      console.log(`✅ 商品图片上传成功，商品ID: ${productId}`);
+      return imageUrls;
+    } catch (error) {
+      console.error('❌ 上传商品图片失败:', error);
+      throw error;
+    }
+  }
+
+  // ========================================
+  // 🎯 删除商品图片
+  // ========================================
+  /**
+   * 删除商品图片（从 MinIO 和数据库）
+   * 🤔 为什么要删除物理文件？
+   * 答：避免对象存储空间浪费
+   */
+  async deleteProductImage(
+    productId: number,
+    sellerId: number,
+    imageUrl: string
+  ): Promise<void> {
+    console.log(`🗑️ 删除商品图片，商品ID: ${productId}，图片: ${imageUrl}`);
+
+    try {
+      // 1️⃣ 验证权限
+      const product = await Product.findByPk(productId);
+
+      if (!product) {
+        throw new AppError(404, 'PRODUCT_NOT_FOUND', '商品不存在');
+      }
+
+      if (product.seller_id !== sellerId) {
+        throw new AppError(403, 'FORBIDDEN', '无权删除此商品图片');
+      }
+
+      // 2️⃣ 从数据库移除图片URL
+      const currentImages = product.images ? JSON.parse(product.images) : [];
+      const newImages = currentImages.filter((img: string) => img !== imageUrl);
+
+      if (currentImages.length === newImages.length) {
+        throw new AppError(404, 'IMAGE_NOT_FOUND', '图片不存在');
+      }
+
+      await product.update({
+        images: JSON.stringify(newImages)
+      });
+
+      // 3️⃣ 从 MinIO 删除文件
+      // 从 URL 中提取对象名称（最后一个 / 后面的部分）
+      const objectName = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
+
+      await minioClient.removeObject(BUCKETS.PRODUCTS, objectName);
+
+      console.log(`✅ 商品图片删除成功，商品ID: ${productId}, 对象: ${objectName}`);
+    } catch (error) {
+      console.error('❌ 删除商品图片失败:', error);
+      throw error;
+    }
   }
 
   // ========================================

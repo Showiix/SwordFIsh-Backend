@@ -13,6 +13,7 @@ import { requestLogger } from "@/middleware/logger";
 import { authenticateToken } from "@/middleware/authenticateToken";
 import { apiLimiter } from "@/middleware/rateLimiter";
 import { validateCreateProduct, validateUpdateProduct, validateUpdateStatus } from "@/middleware/validateProduct";
+import { upload } from "@/config/upload";
 
 const router = Router();
 
@@ -134,6 +135,39 @@ router.delete(
 );
 
 // ========================================
+// 🎯 图片管理路由
+// ========================================
+
+/**
+ * 上传商品图片
+ * POST /api/products/:id/images
+ *
+ * 🤔 为什么使用 memoryStorage？
+ * 答：因为要上传到 MinIO，不需要先保存到本地磁盘
+ */
+router.post(
+  '/:id/images',
+  requestLogger,
+  authenticateToken,
+  upload.array('images', 10),  // 最多10张图片
+  productController.uploadImages.bind(productController)
+);
+
+/**
+ * 删除商品图片
+ * DELETE /api/products/:id/images
+ *
+ * Body 参数：
+ * - imageUrl: 要删除的图片URL
+ */
+router.delete(
+  '/:id/images',
+  requestLogger,
+  authenticateToken,
+  productController.deleteImage.bind(productController)
+);
+
+// ========================================
 // 🎯 TODO: 待实现的路由
 // ========================================
 
@@ -146,18 +180,6 @@ router.delete(
 //   requestLogger,
 //   authenticateToken,
 //   productController.toggleFavorite.bind(productController)
-// );
-
-// /**
-//  * 上传商品图片
-//  * POST /api/products/:id/images
-//  */
-// router.post(
-//   '/:id/images',
-//   requestLogger,
-//   authenticateToken,
-//   upload.array('images', 5),  // 最多5张图片
-//   productController.uploadImages.bind(productController)
 // );
 
 export default router;

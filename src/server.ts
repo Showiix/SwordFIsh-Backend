@@ -7,6 +7,7 @@ import config from './config';
 import { sequelize } from './config/database';
 // @ts-ignore - Redis配置文件使用JS
 import { initRedis } from './config/redis';
+import { initMinIO } from './config/minio';
 
 const PORT = config.app.port || 3000;
 
@@ -19,6 +20,9 @@ async function startServer() {
 
     // 初始化Redis连接
     await initRedis();
+
+    // 初始化MinIO
+    await initMinIO();
 
     // 启动服务器
     app.listen(PORT, () => {
@@ -43,6 +47,21 @@ async function startServer() {
       console.log(`  - DELETE /api/products/:id      删除商品`);
       console.log(`  - GET    /api/products/my/list  我的商品`);
       console.log(`  - PATCH  /api/products/:id/status 更新商品状态`);
+      console.log(`  - POST   /api/products/:id/images 上传商品图片`);
+      console.log(`  - DELETE /api/products/:id/images 删除商品图片`);
+      console.log('');
+      console.log('【收藏管理】');
+      console.log(`  - GET    /api/favorites         获取我的收藏`);
+      console.log(`  - POST   /api/favorites         收藏商品`);
+      console.log(`  - DELETE /api/favorites/:id     取消收藏`);
+      console.log(`  - GET    /api/favorites/check/:id 检查收藏状态`);
+      console.log(`  - POST   /api/favorites/batch-check 批量检查收藏`);
+      console.log('');
+      console.log('【搜索功能】');
+      console.log(`  - GET    /api/search/hot        获取热门搜索`);
+      console.log(`  - GET    /api/search/suggest    搜索建议`);
+      console.log(`  - GET    /api/search/history    我的搜索历史`);
+      console.log(`  - DELETE /api/search/history    清空搜索历史`);
       console.log('');
       console.log('【系统】');
       console.log(`  - GET    /health                健康检查`);
