@@ -14,24 +14,31 @@ import { ApiResponse, RegisterRequestBody, LoginRequestBody } from '../types';
 
 /**
  * 验证邮箱格式
- * 🤔 邮箱规则：xxx@xxx.xxx
+ * 🎯 校园邮箱规则：必须以 .edu.cn 结尾
+ * 示例：zhangsan@xxx.edu.cn
  */
 export function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+  // 限制为校园邮箱（.edu.cn 结尾）
+  const campusEmailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.edu\.cn$/;
+  return campusEmailRegex.test(email);
+
+  // 如果需要支持所有邮箱，使用以下正则：
+  // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // return emailRegex.test(email);
 }
 
 /**
  * 验证密码强度
- * 🤔 密码要求：至少8位
- * 💡 可以扩展：必须包含大小写字母、数字等
+ * 🎯 密码要求：
+ * - 至少8位
+ * - 至少包含一个大写字母
+ * - 至少包含一个小写字母
+ * - 至少包含一个数字
  */
 export function isValidPassword(password: string): boolean {
-  return password.length >= 8;
-  
-  // 更强的密码规则（可选）：
-  // const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
-  // return strongPasswordRegex.test(password);
+  // 强密码规则：至少8位，包含大小写字母和数字
+  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/;
+  return strongPasswordRegex.test(password);
 }
 
 /**
@@ -109,14 +116,14 @@ export function validateRegister(
   // 3️⃣ 验证邮箱格式
   // ========================================
   if (!isValidEmail(email)) {
-    console.log('❌ 验证失败: 邮箱格式不正确');
-    
+    console.log('❌ 验证失败: 必须使用校园邮箱（.edu.cn）');
+
     const response: ApiResponse<null> = {
       code: 400,
-      msg: '邮箱格式不正确',
+      msg: '必须使用校园邮箱（.edu.cn）',
       data: null
     };
-    
+
     res.status(400).json(response);
     return;
   }
@@ -125,14 +132,14 @@ export function validateRegister(
   // 4️⃣ 验证密码强度
   // ========================================
   if (!isValidPassword(password)) {
-    console.log('❌ 验证失败: 密码长度至少8位');
-    
+    console.log('❌ 验证失败: 密码必须至少8位，且包含大小写字母和数字');
+
     const response: ApiResponse<null> = {
       code: 400,
-      msg: '密码长度至少8位',
+      msg: '密码必须至少8位，且包含大小写字母和数字',
       data: null
     };
-    
+
     res.status(400).json(response);
     return;
   }
@@ -187,7 +194,7 @@ export function validateLogin(
   if (!isValidEmail(email)) {
     const response: ApiResponse<null> = {
       code: 400,
-      msg: '邮箱格式不正确',
+      msg: '必须使用校园邮箱（.edu.cn）',
       data: null
     };
     res.status(400).json(response);

@@ -117,7 +117,18 @@ const config: Config = {
   },
 
   jwt: {
-    secret: process.env.JWT_SECRET || 'swordfish_jwt_secret_key_2024',
+    secret: (() => {
+      const secret = process.env.JWT_SECRET;
+      if (!secret) {
+        if (process.env.NODE_ENV === 'production') {
+          throw new Error('JWT_SECRET must be set in production environment!');
+        }
+        console.warn('⚠️  WARNING: Using default JWT secret. This is ONLY for deve
+          lopment!');
+        return 'dev_only_jwt_secret_DO_NOT_USE_IN_PRODUCTION';
+      }
+      return secret;
+    })(),
     expiresIn: process.env.JWT_EXPIRES_IN || '24h',
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d'
   },

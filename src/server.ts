@@ -5,6 +5,8 @@
 import app from './app';
 import config from './config';
 import { sequelize } from './config/database';
+// @ts-ignore - Redis配置文件使用JS
+import { initRedis } from './config/redis';
 
 const PORT = config.app.port || 3000;
 
@@ -14,6 +16,9 @@ async function startServer() {
     // 测试数据库连接
     await sequelize.authenticate();
     console.log('✅ 数据库连接成功');
+
+    // 初始化Redis连接
+    await initRedis();
 
     // 启动服务器
     app.listen(PORT, () => {
