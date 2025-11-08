@@ -29,10 +29,23 @@ async function startServer() {
       console.log('====================================');
       console.log('');
       console.log('可用的接口:');
-      console.log(`  - POST   /api/auth/register  注册`);
-      console.log(`  - POST   /api/auth/login     登录`);
-      console.log(`  - GET    /api/auth/user/info 获取个人信息`);
-      console.log(`  - GET    /health             健康检查`);
+      console.log('');
+      console.log('【用户认证】');
+      console.log(`  - POST   /api/auth/register     注册`);
+      console.log(`  - POST   /api/auth/login        登录`);
+      console.log(`  - GET    /api/auth/user/info    获取个人信息`);
+      console.log('');
+      console.log('【商品管理】');
+      console.log(`  - GET    /api/products          获取商品列表`);
+      console.log(`  - GET    /api/products/:id      获取商品详情`);
+      console.log(`  - POST   /api/products          发布商品`);
+      console.log(`  - PUT    /api/products/:id      更新商品`);
+      console.log(`  - DELETE /api/products/:id      删除商品`);
+      console.log(`  - GET    /api/products/my/list  我的商品`);
+      console.log(`  - PATCH  /api/products/:id/status 更新商品状态`);
+      console.log('');
+      console.log('【系统】');
+      console.log(`  - GET    /health                健康检查`);
       console.log('====================================');
     });
   } catch (error) {

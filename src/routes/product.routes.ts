@@ -12,6 +12,7 @@ import productController from "@/controllers/product.controller";
 import { requestLogger } from "@/middleware/logger";
 import { authenticateToken } from "@/middleware/authenticateToken";
 import { apiLimiter } from "@/middleware/rateLimiter";
+import { validateCreateProduct, validateUpdateProduct, validateUpdateStatus } from "@/middleware/validateProduct";
 
 const router = Router();
 
@@ -90,7 +91,7 @@ router.post(
   apiLimiter,                    // 限流
   requestLogger,
   authenticateToken,             // 验证身份
-  // TODO: 添加数据验证中间件
+  validateCreateProduct,         // 验证商品数据
   productController.createProduct.bind(productController)
 );
 
@@ -102,7 +103,7 @@ router.put(
   '/:id',
   requestLogger,
   authenticateToken,
-  // TODO: 添加数据验证中间件
+  validateUpdateProduct,         // 验证更新数据
   productController.updateProduct.bind(productController)
 );
 
@@ -117,6 +118,7 @@ router.patch(
   '/:id/status',
   requestLogger,
   authenticateToken,
+  validateUpdateStatus,          // 验证状态数据
   productController.updateProductStatus.bind(productController)
 );
 

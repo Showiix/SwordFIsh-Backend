@@ -6,6 +6,7 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import authRoutes from './routes/auth.routes';
+import productRoutes from './routes/product.routes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { requestLogger, detailedLogger } from './middleware/logger';
 import { apiLimiter } from './middleware/rateLimiter';
@@ -44,6 +45,7 @@ if (config.app.env === 'development') {
 app.use('/api/', apiLimiter);
 
 app.use('/api/auth', authRoutes);
+app.use('/api/products', productRoutes);
 // 每个路由内部还可以有自己的中间件
 
 // ========================================
