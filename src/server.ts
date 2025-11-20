@@ -5,9 +5,10 @@
 import app from './app';
 import config from './config';
 import { sequelize } from './config/database';
-// @ts-ignore - Redis配置文件使用JS
 import { initRedis } from './config/redis';
 import { initMinIO } from './config/minio';
+// 导入模型关联配置 (必须在使用模型之前导入)
+import '@/models/index';
 
 const PORT = config.app.port || 3000;
 
@@ -21,8 +22,16 @@ async function startServer() {
     // 初始化Redis连接
     await initRedis();
 
-    // 初始化MinIO
-    await initMinIO();
+    // 初始化MinIO（开发环境失败不影响启动）
+    try {
+      await initMinIO();
+    } catch (error: any) {
+      console.warn('⚠️  MinIO 初始化失败，文件上传功能将不可用');
+      console.warn('💡 提示：如需使用文件上传功能，请启动 MinIO 服务');
+      if (config.app.env === 'production') {
+        throw error; // 生产环境必须有 MinIO
+      }
+    }
 
     // 启动服务器
     app.listen(PORT, () => {

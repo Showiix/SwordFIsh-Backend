@@ -11,9 +11,9 @@ import { Op, literal } from "sequelize";
 import { minioClient, BUCKETS, getPublicUrl } from '@/config/minio';
 import crypto from 'crypto';
 
-// 导入模型时需要使用 require，因为 Product.js 是 CommonJS 模块
-const { Product, Category } = require("@/models/Product");
-const User = require("@/models/User").default;
+// 导入模型 (TypeScript 版本)
+import { Product, Category } from "@/models/Product";
+import User from "@/models/User";
 
 // ========================================
 // 🎯 接口定义
@@ -80,7 +80,7 @@ class ProductService {
     // 2️⃣ 创建商品
     const product = await Product.create({
       ...data,
-      images: data.images ? JSON.stringify(data.images) : null,
+      images: data.images ?? null,
       status: 'pending', // 默认待审核
       view_count: 0,
       favorite_count: 0,
@@ -436,7 +436,7 @@ class ProductService {
       }
 
       // 3️⃣ 更新商品图片（追加到现有图片）
-      const currentImages = product.images ? JSON.parse(product.images) : [];
+      const currentImages = product.images || [];
       const newImages = [...currentImages, ...imageUrls];
 
       // 限制最多10张图片
@@ -452,7 +452,7 @@ class ProductService {
       }
 
       await product.update({
-        images: JSON.stringify(newImages)
+        images: newImages
       });
 
       console.log(`✅ 商品图片上传成功，商品ID: ${productId}`);
@@ -491,7 +491,7 @@ class ProductService {
       }
 
       // 2️⃣ 从数据库移除图片URL
-      const currentImages = product.images ? JSON.parse(product.images) : [];
+      const currentImages = product.images || [];
       const newImages = currentImages.filter((img: string) => img !== imageUrl);
 
       if (currentImages.length === newImages.length) {
@@ -499,7 +499,7 @@ class ProductService {
       }
 
       await product.update({
-        images: JSON.stringify(newImages)
+        images: newImages
       });
 
       // 3️⃣ 从 MinIO 删除文件
@@ -536,7 +536,7 @@ class ProductService {
       category_id: data.category_id,
       condition_level: data.condition_level,
       product_type: data.product_type,
-      images: typeof data.images === 'string' ? JSON.parse(data.images) : data.images,
+      images: data.images,  // Sequelize自动处理JSON类型
       location: data.location,
       status: data.status,
       view_count: data.view_count,

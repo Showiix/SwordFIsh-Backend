@@ -6,9 +6,22 @@
 //     从 .env 文件读取配置项
 
 import dotenv from 'dotenv';
+import { existsSync } from 'fs';
+import { resolve } from 'path';
 
 // 根据环境加载对应的 .env 文件
-dotenv.config({ path: `.env.${process.env.NODE_ENV || 'development'}` });
+const envFile = `.env.${process.env.NODE_ENV || 'development'}`;
+const defaultEnvFile = '.env';
+
+// 优先加载环境特定的配置文件，如果不存在则使用默认 .env
+if (existsSync(resolve(process.cwd(), envFile))) {
+  dotenv.config({ path: envFile });
+} else if (existsSync(resolve(process.cwd(), defaultEnvFile))) {
+  dotenv.config({ path: defaultEnvFile });
+} else {
+  console.warn('⚠️  WARNING: No .env file found. Using default configuration.');
+  dotenv.config(); // 尝试默认加载
+}
 
 // ========================================
 // 🎯 定义配置对象的类型
