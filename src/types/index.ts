@@ -73,6 +73,7 @@ export interface UserAttributes {
     avatar_url?: string;                     // 头像URL
     auth_status: number;                     // 认证状态：0未认证，1已认证
     status: 'active' | 'inactive' | 'banned'; // 账户状态
+    role: 'user' | 'admin';                  // 用户角色
     last_login?: Date;                       // 最后登录时间
     verification_token?: string;             // ⚠️ 邮箱验证令牌
     is_verified: boolean;                    // 是否已验证邮箱
@@ -143,5 +144,6 @@ export interface AuthenticatedRequest extends Request {
         id: number;           // 从 Token 解析出的用户ID
         student_id: string;   // 从 Token 解析出的学号
         email: string;        // 从 Token 解析出的邮箱
+        role?: 'user' | 'admin';  // 用户角色（管理端需要）
     };
 }

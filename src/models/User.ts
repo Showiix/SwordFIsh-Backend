@@ -44,6 +44,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public avatar_url?: string;
   public auth_status!: number;
   public status!: 'active' | 'inactive' | 'banned';
+  public role!: 'user' | 'admin';
   public last_login?: Date;
   public verification_token?: string;
   public is_verified!: boolean;
@@ -122,6 +123,12 @@ User.init(
       allowNull: false,
       defaultValue: 'active',
       comment: '账户状态'
+    },
+    role: {
+      type: DataTypes.ENUM('user', 'admin'),
+      allowNull: false,
+      defaultValue: 'user',
+      comment: '用户角色：user=普通用户，admin=管理员'
     },
     last_login: {
       type: DataTypes.DATE,

@@ -6,6 +6,11 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import authRoutes from './routes/auth.routes';
+import adminUserRoutes from './routes/admin/user.routes';
+import adminProductRoutes from './routes/admin/product.routes';
+import adminOrderRoutes from './routes/admin/order.routes';
+import adminComplaintRoutes from './routes/admin/complaint.routes';
+import adminStatisticsRoutes from './routes/admin/statistics.routes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { requestLogger, detailedLogger } from './middleware/logger';
 import config from './config';
@@ -39,8 +44,15 @@ if (config.app.env === 'development') {
 // ========================================
 // 4️⃣ API 路由
 // ========================================
+// 用户端路由
 app.use('/api/auth', authRoutes);
-// 每个路由内部还可以有自己的中间件
+
+// 管理端路由
+app.use('/api/admin/users', adminUserRoutes);
+app.use('/api/admin/products', adminProductRoutes);
+app.use('/api/admin/orders', adminOrderRoutes);
+app.use('/api/admin/complaints', adminComplaintRoutes);
+app.use('/api/admin/statistics', adminStatisticsRoutes);
 
 // ========================================
 // 5️⃣ 健康检查
