@@ -1,12 +1,17 @@
-// 数据模型关联配置和导出
-const User = require('./User');
-const UserCredit = require('./UserCredit');
-const { Category, Product } = require('./Product');
-const Order = require('./Order');
-const Message = require('./Message');
-const { Review, Complaint } = require('./Review');
+// ========================================
+// 数据模型关联配置和导出 (TypeScript 版本)
+// ========================================
 
+import User from './User';
+import UserCredit from './UserCredit';
+import { Category, Product } from './Product';
+import Order from './Order';
+import Message from './Message';
+import { Review, Complaint } from './Review';
+
+// ========================================
 // 定义模型关联关系
+// ========================================
 
 // 用户与信用记录 (一对多)
 User.hasMany(UserCredit, {
@@ -208,8 +213,10 @@ Complaint.belongsTo(Product, {
   as: 'product'
 });
 
+// ========================================
 // 导出所有模型
-module.exports = {
+// ========================================
+export {
   User,
   UserCredit,
   Category,

@@ -144,4 +144,7 @@ export interface AuthenticatedRequest extends Request {
         student_id: string;   // 从 Token 解析出的学号
         email: string;        // 从 Token 解析出的邮箱
     };
+    // Multer 的文件类型定义（支持多种格式）
+    files?: Express.Multer.File[] | { [fieldname: string]: Express.Multer.File[] };
+    file?: Express.Multer.File;     // Multer 上传的单个文件
 }
