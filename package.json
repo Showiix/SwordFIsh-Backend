@@ -6,6 +6,8 @@
   "scripts": {
     "start": "ts-node -r tsconfig-paths/register src/server.ts",
     "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/server.ts",
+    "dev:mock": "cross-env USE_MOCK_DATA=true nodemon --exec ts-node -r tsconfig-paths/register src/server.ts",
+    "dev:db": "cross-env USE_MOCK_DATA=false nodemon --exec ts-node -r tsconfig-paths/register src/server.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",

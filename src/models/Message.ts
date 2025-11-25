@@ -4,6 +4,31 @@
 
 import { DataTypes, Model, Optional } from 'sequelize';
 import { sequelize } from '../config/database';
+import { MessageAttributes, MessageType } from '../types';
+
+// ========================================
+// 创建消息时的可选字段
+// ========================================
+interface MessageCreationAttributes extends Optional<
+  MessageAttributes,
+  'id' | 'product_id' | 'order_id' | 'read_at' | 'created_at' | 'updated_at'
+> {}
+
+// ========================================
+// Message 模型类
+// ========================================
+class Message extends Model<MessageAttributes, MessageCreationAttributes> implements MessageAttributes {
+  public id!: number;
+  public sender_id!: number;
+  public receiver_id!: number;
+  public product_id?: number;
+  public order_id?: number;
+  public content!: string;
+  public message_type!: MessageType;
+  public is_read!: boolean;
+  public read_at?: Date;
+  public is_deleted!: boolean;
+
 
 export interface MessageAttributes {
   id: number;
@@ -40,6 +65,9 @@ export class Message extends Model<MessageAttributes, MessageCreationAttributes>
   public readonly updated_at!: Date;
 }
 
+// ========================================
+// 初始化模型
+// ========================================
 Message.init(
   {
     id: {
@@ -111,6 +139,16 @@ Message.init(
       allowNull: false,
       defaultValue: false,
       comment: '是否已删除'
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      field: 'created_at'
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      field: 'updated_at'
     }
   },
   {

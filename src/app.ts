@@ -6,6 +6,7 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import authRoutes from './routes/auth.routes';
+import chatRoutes from './routes/chat.routes';
 import productRoutes from './routes/product.routes';
 import favoriteRoutes from './routes/favorite.routes';
 import searchRoutes from './routes/search.routes';
@@ -47,6 +48,7 @@ if (config.app.env === 'development') {
 app.use('/api/', apiLimiter);
 
 app.use('/api/auth', authRoutes);
+app.use('/api/chat', chatRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/favorites', favoriteRoutes);
 app.use('/api/search', searchRoutes);
