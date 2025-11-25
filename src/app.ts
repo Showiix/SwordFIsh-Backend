@@ -7,8 +7,12 @@ import cors from 'cors';
 import helmet from 'helmet';
 import authRoutes from './routes/auth.routes';
 import chatRoutes from './routes/chat.routes';
+import productRoutes from './routes/product.routes';
+import favoriteRoutes from './routes/favorite.routes';
+import searchRoutes from './routes/search.routes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { requestLogger, detailedLogger } from './middleware/logger';
+import { apiLimiter } from './middleware/rateLimiter';
 import config from './config';
 
 const app: Application = express();
@@ -17,13 +21,13 @@ const app: Application = express();
 // 1️⃣ 安全相关中间件
 // ========================================
 app.use(helmet());  // 设置安全 HTTP 头
-app.use(cors());    // 允许跨域
+app.use(cors());    // 允许跨域（开发模式：允许所有来源）
 
 // ========================================
 // 2️⃣ 请求解析中间件
 // ========================================
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' })); // 限制请求体大小
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // ========================================
 // 3️⃣ 日志中间件（全局）
@@ -40,8 +44,14 @@ if (config.app.env === 'development') {
 // ========================================
 // 4️⃣ API 路由
 // ========================================
+// 对所有 API 路由应用限流
+app.use('/api/', apiLimiter);
+
 app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/favorites', favoriteRoutes);
+app.use('/api/search', searchRoutes);
 // 每个路由内部还可以有自己的中间件
 
 // ========================================

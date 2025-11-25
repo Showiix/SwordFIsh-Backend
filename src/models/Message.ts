@@ -29,6 +29,38 @@ class Message extends Model<MessageAttributes, MessageCreationAttributes> implem
   public read_at?: Date;
   public is_deleted!: boolean;
 
+
+export interface MessageAttributes {
+  id: number;
+  sender_id: number;
+  receiver_id: number;
+  product_id: number | null;
+  order_id: number | null;
+  content: string;
+  message_type: 'text' | 'image' | 'file' | 'system';
+  is_read: boolean;
+  read_at: Date | null;
+  is_deleted: boolean;
+  created_at?: Date;
+  updated_at?: Date;
+}
+
+interface MessageCreationAttributes extends Optional<
+  MessageAttributes,
+  'id' | 'product_id' | 'order_id' | 'message_type' | 'is_read' | 'read_at' | 'is_deleted' | 'created_at' | 'updated_at'
+> {}
+
+export class Message extends Model<MessageAttributes, MessageCreationAttributes> implements MessageAttributes {
+  public id!: number;
+  public sender_id!: number;
+  public receiver_id!: number;
+  public product_id!: number | null;
+  public order_id!: number | null;
+  public content!: string;
+  public message_type!: 'text' | 'image' | 'file' | 'system';
+  public is_read!: boolean;
+  public read_at!: Date | null;
+  public is_deleted!: boolean;
   public readonly created_at!: Date;
   public readonly updated_at!: Date;
 }

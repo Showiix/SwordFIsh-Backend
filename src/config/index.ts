@@ -6,9 +6,22 @@
 //     从 .env 文件读取配置项
 
 import dotenv from 'dotenv';
+import { existsSync } from 'fs';
+import { resolve } from 'path';
 
 // 根据环境加载对应的 .env 文件
-dotenv.config({ path: `.env.${process.env.NODE_ENV || 'development'}` });
+const envFile = `.env.${process.env.NODE_ENV || 'development'}`;
+const defaultEnvFile = '.env';
+
+// 优先加载环境特定的配置文件，如果不存在则使用默认 .env
+if (existsSync(resolve(process.cwd(), envFile))) {
+  dotenv.config({ path: envFile });
+} else if (existsSync(resolve(process.cwd(), defaultEnvFile))) {
+  dotenv.config({ path: defaultEnvFile });
+} else {
+  console.warn('⚠️  WARNING: No .env file found. Using default configuration.');
+  dotenv.config(); // 尝试默认加载
+}
 
 // ========================================
 // 🎯 定义配置对象的类型
@@ -77,6 +90,15 @@ interface LogConfig {
   maxFiles: string;
 }
 
+interface MinioConfig {
+  endPoint: string;
+  port: number;
+  useSSL: boolean;
+  accessKey: string;
+  secretKey: string;
+  region: string;
+}
+
 // ========================================
 // 🎯 完整的配置接口
 // ========================================
@@ -90,6 +112,7 @@ export interface Config {
   upload: UploadConfig;
   rateLimit: RateLimitConfig;
   log: LogConfig;
+  minio: MinioConfig;
 }
 
 // ========================================
@@ -117,7 +140,17 @@ const config: Config = {
   },
 
   jwt: {
-    secret: process.env.JWT_SECRET || 'swordfish_jwt_secret_key_2024',
+    secret: (() => {
+      const secret = process.env.JWT_SECRET;
+      if (!secret) {
+        if (process.env.NODE_ENV === 'production') {
+          throw new Error('JWT_SECRET must be set in production environment!');
+        }
+        console.warn('⚠️  WARNING: Using default JWT secret. This is ONLY for development!');
+        return 'dev_only_jwt_secret_DO_NOT_USE_IN_PRODUCTION';
+      }
+      return secret;
+    })(),
     expiresIn: process.env.JWT_EXPIRES_IN || '24h',
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d'
   },
@@ -158,6 +191,15 @@ const config: Config = {
     level: process.env.LOG_LEVEL || 'info',
     maxSize: process.env.LOG_MAX_SIZE || '20m',
     maxFiles: process.env.LOG_MAX_FILES || '14d'
+  },
+
+  minio: {
+    endPoint: process.env.MINIO_ENDPOINT || 'localhost',
+    port: parseInt(process.env.MINIO_PORT || '9000', 10),
+    useSSL: process.env.MINIO_USE_SSL === 'true',
+    accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
+    secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
+    region: process.env.MINIO_REGION || 'us-east-1'
   }
 };
 
