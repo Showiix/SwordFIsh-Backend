@@ -6,6 +6,7 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import authRoutes from './routes/auth.routes';
+import chatRoutes from './routes/chat.routes';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { requestLogger, detailedLogger } from './middleware/logger';
 import config from './config';
@@ -40,6 +41,7 @@ if (config.app.env === 'development') {
 // 4️⃣ API 路由
 // ========================================
 app.use('/api/auth', authRoutes);
+app.use('/api/chat', chatRoutes);
 // 每个路由内部还可以有自己的中间件
 
 // ========================================

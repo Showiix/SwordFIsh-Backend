@@ -145,3 +145,54 @@ export interface AuthenticatedRequest extends Request {
         email: string;        // 从 Token 解析出的邮箱
     };
 }
+
+// ========================================
+// 🎯 第4组：聊天模块类型定义
+// ========================================
+
+/**
+ * 消息类型枚举
+ */
+export type MessageType = 'text' | 'image' | 'file' | 'system';
+
+/**
+ * 消息数据库模型
+ */
+export interface MessageAttributes {
+  id: number;
+  sender_id: number;
+  receiver_id: number;
+  product_id?: number;
+  order_id?: number;
+  content: string;
+  message_type: MessageType;
+  is_read: boolean;
+  read_at?: Date;
+  is_deleted: boolean;
+  created_at: Date;
+  updated_at: Date;
+}
+
+/**
+ * 发送消息请求体
+ */
+export interface SendMessageRequest {
+  receiver_id: number;
+  content: string;
+  message_type?: MessageType;
+  product_id?: number;
+  order_id?: number;
+}
+
+/**
+ * 聊天会话信息
+ */
+export interface ConversationInfo {
+  user: {
+    id: number;
+    username: string;
+    avatar_url?: string;
+  };
+  lastMessage: MessageAttributes;
+  unreadCount: number;
+}
