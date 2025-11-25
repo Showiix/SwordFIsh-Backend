@@ -46,6 +46,7 @@ class AuthService{
             real_name: username,
             auth_status: 0,
             status: 'active',
+            role: 'user',
             is_verified: false,
             username,
         });

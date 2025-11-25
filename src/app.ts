@@ -6,6 +6,11 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import authRoutes from './routes/auth.routes';
+import adminUserRoutes from './routes/admin/user.routes';
+import adminProductRoutes from './routes/admin/product.routes';
+import adminOrderRoutes from './routes/admin/order.routes';
+import adminComplaintRoutes from './routes/admin/complaint.routes';
+import adminStatisticsRoutes from './routes/admin/statistics.routes';
 import chatRoutes from './routes/chat.routes';
 import productRoutes from './routes/product.routes';
 import favoriteRoutes from './routes/favorite.routes';
@@ -44,6 +49,15 @@ if (config.app.env === 'development') {
 // ========================================
 // 4️⃣ API 路由
 // ========================================
+// 用户端路由
+app.use('/api/auth', authRoutes);
+
+// 管理端路由
+app.use('/api/admin/users', adminUserRoutes);
+app.use('/api/admin/products', adminProductRoutes);
+app.use('/api/admin/orders', adminOrderRoutes);
+app.use('/api/admin/complaints', adminComplaintRoutes);
+app.use('/api/admin/statistics', adminStatisticsRoutes);
 // 对所有 API 路由应用限流
 app.use('/api/', apiLimiter);
 
